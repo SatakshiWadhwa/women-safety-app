@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import API from "../api/api";
 import { io } from "socket.io-client";
 
-const socket = io("http://10.171.52.162:5000");
+const socket = io("https://safecampus-backend-4c6u.onrender.com");
 
 function NightWalkBuddy() {
   const { user } = useAuth();

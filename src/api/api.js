@@ -1,7 +1,7 @@
 ﻿import axios from "axios";
 
 const API = axios.create({
-  baseURL: "http://10.171.52.162:5000/api",
+  baseURL: "https://safecampus-backend-4c6u.onrender.com/api",
 });
 
 API.interceptors.request.use((config) => {
