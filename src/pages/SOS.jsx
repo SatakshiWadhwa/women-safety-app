@@ -1,4 +1,4 @@
-﻿import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef } from "react";
 import API from "../api/api";
 
 function SOS() {
@@ -8,7 +8,7 @@ function SOS() {
   const [history, setHistory] = useState([]);
   const [error, setError] = useState("");
   const [voiceActive, setVoiceActive] = useState(false);
-  const [shakeActive, setShakeActive] = useState(false);
+  const [shakeActive, setShakeActive] = useState(() => localStorage.getItem("shakeActive") === "true");
   const [voiceStatus, setVoiceStatus] = useState("");
   const [liveTracking, setLiveTracking] = useState(false);
   const [currentSosId, setCurrentSosId] = useState(null);
@@ -173,9 +173,9 @@ function SOS() {
   const toggleShake = () => {
     if (!shakeActive) {
       if (typeof DeviceMotionEvent !== "undefined" && typeof DeviceMotionEvent.requestPermission === "function") {
-        DeviceMotionEvent.requestPermission().then((res) => { if (res === "granted") setShakeActive(true); }).catch(() => setError("Motion permission denied."));
-      } else { setShakeActive(true); }
-    } else { setShakeActive(false); }
+        DeviceMotionEvent.requestPermission().then((res) => { if (res === "granted") setShakeActive(true); localStorage.setItem("shakeActive", "true"); }).catch(() => setError("Motion permission denied."));
+      } else { setShakeActive(true); localStorage.setItem("shakeActive", "true"); }
+    } else { setShakeActive(false); localStorage.setItem("shakeActive", "false"); }
   };
 
   return (
@@ -233,9 +233,9 @@ function SOS() {
                       >
                         <div className="text-left">
                           <p className="font-semibold">{contact.name}</p>
-                          <p className="text-green-100 text-sm">{contact.relation} — {contact.phone}</p>
+                          <p className="text-green-100 text-sm">{contact.relation} � {contact.phone}</p>
                         </div>
-                        <span className="text-2xl">💬</span>
+                        <span className="text-2xl">??</span>
                       </button>
                     ))}
                   </div>
@@ -269,7 +269,7 @@ function SOS() {
         <div className="bg-white rounded-2xl shadow p-6 mb-4">
           <div className="flex justify-between items-center">
             <div>
-              <h2 className="text-lg font-bold text-gray-800">🎤 Voice SOS</h2>
+              <h2 className="text-lg font-bold text-gray-800">?? Voice SOS</h2>
               <p className="text-gray-500 text-sm mt-1">Say "help", "emergency" or "bachao"</p>
               {voiceStatus && <p className="text-pink-600 text-sm mt-2 font-medium">{voiceStatus}</p>}
             </div>
@@ -285,7 +285,7 @@ function SOS() {
         <div className="bg-white rounded-2xl shadow p-6 mb-6">
           <div className="flex justify-between items-center">
             <div>
-              <h2 className="text-lg font-bold text-gray-800">📳 Shake Detection</h2>
+              <h2 className="text-lg font-bold text-gray-800">?? Shake Detection</h2>
               <p className="text-gray-500 text-sm mt-1">Shake your phone to trigger SOS</p>
               {shakeActive && <p className="text-green-600 text-sm mt-2 font-medium">Shake detection active!</p>}
             </div>

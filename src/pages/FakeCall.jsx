@@ -9,30 +9,34 @@ function FakeCall() {
   const timerRef = useRef(null);
   const callTimerRef = useRef(null);
   const audioCtxRef = useRef(null);
+  const ringIntervalRef = useRef(null);
 
   const playRingtone = () => {
-    const ctx = new (window.AudioContext || window.webkitAudioContext)();
-    audioCtxRef.current = ctx;
-
-    const playBeep = (startTime) => {
+    const playBeepCycle = () => {
+      const ctx = new (window.AudioContext || window.webkitAudioContext)();
+      audioCtxRef.current = ctx;
       const osc = ctx.createOscillator();
       const gain = ctx.createGain();
       osc.connect(gain);
       gain.connect(ctx.destination);
       osc.frequency.value = 480;
       osc.type = "sine";
-      gain.gain.setValueAtTime(0.3, startTime);
-      gain.gain.setValueAtTime(0, startTime + 0.4);
-      osc.start(startTime);
-      osc.stop(startTime + 0.4);
+      gain.gain.setValueAtTime(0.4, ctx.currentTime);
+      gain.gain.setValueAtTime(0, ctx.currentTime + 0.4);
+      gain.gain.setValueAtTime(0.4, ctx.currentTime + 0.6);
+      gain.gain.setValueAtTime(0, ctx.currentTime + 1.0);
+      osc.start();
+      osc.stop(ctx.currentTime + 1.0);
     };
-
-    for (let i = 0; i < 6; i++) {
-      playBeep(ctx.currentTime + i * 0.6);
-    }
+    playBeepCycle();
+    ringIntervalRef.current = setInterval(playBeepCycle, 2000);
   };
 
   const stopRingtone = () => {
+    if (ringIntervalRef.current) {
+      clearInterval(ringIntervalRef.current);
+      ringIntervalRef.current = null;
+    }
     if (audioCtxRef.current) {
       audioCtxRef.current.close();
       audioCtxRef.current = null;
@@ -42,7 +46,6 @@ function FakeCall() {
   const startCountdown = () => {
     setStatus("waiting");
     setTimeLeft(delay);
-
     timerRef.current = setInterval(() => {
       setTimeLeft((prev) => {
         if (prev <= 1) {
@@ -92,29 +95,21 @@ function FakeCall() {
     return `${m}:${s}`;
   };
 
-  // RINGING SCREEN
   if (status === "ringing") {
     return (
       <div className="min-h-screen bg-gray-900 flex flex-col items-center justify-between py-16 px-6">
         <div className="flex flex-col items-center gap-4 mt-10">
-          <div className="w-24 h-24 rounded-full bg-pink-500 flex items-center justify-center text-4xl text-white font-bold shadow-lg">
+          <div className="w-24 h-24 rounded-full bg-pink-500 flex items-center justify-center text-4xl text-white font-bold shadow-lg animate-pulse">
             {callerName.charAt(0).toUpperCase()}
           </div>
           <h2 className="text-white text-3xl font-bold">{callerName}</h2>
           <p className="text-gray-400 text-lg">Incoming Call...</p>
         </div>
-
         <div className="flex gap-16 mb-10">
-          <button
-            onClick={endCall}
-            className="w-16 h-16 rounded-full bg-red-500 flex items-center justify-center text-white text-2xl shadow-lg hover:bg-red-600"
-          >
+          <button onClick={endCall} className="w-16 h-16 rounded-full bg-red-500 flex items-center justify-center text-white text-2xl shadow-lg hover:bg-red-600">
             ✕
           </button>
-          <button
-            onClick={answerCall}
-            className="w-16 h-16 rounded-full bg-green-500 flex items-center justify-center text-white text-2xl shadow-lg hover:bg-green-600"
-          >
+          <button onClick={answerCall} className="w-16 h-16 rounded-full bg-green-500 flex items-center justify-center text-white text-2xl shadow-lg hover:bg-green-600">
             ✆
           </button>
         </div>
@@ -122,7 +117,6 @@ function FakeCall() {
     );
   }
 
-  // ONGOING CALL SCREEN
   if (status === "ongoing") {
     return (
       <div className="min-h-screen bg-gray-900 flex flex-col items-center justify-between py-16 px-6">
@@ -134,29 +128,20 @@ function FakeCall() {
           <p className="text-green-400 text-lg">{formatTime(callDuration)}</p>
           <p className="text-gray-400 text-sm">Ongoing call...</p>
         </div>
-
-        <button
-          onClick={endCall}
-          className="w-16 h-16 rounded-full bg-red-500 flex items-center justify-center text-white text-2xl shadow-lg hover:bg-red-600 mb-10"
-        >
+        <button onClick={endCall} className="w-16 h-16 rounded-full bg-red-500 flex items-center justify-center text-white text-2xl shadow-lg hover:bg-red-600 mb-10">
           ✕
         </button>
       </div>
     );
   }
 
-  // SETUP SCREEN
   return (
     <div className="min-h-screen bg-pink-50 p-6">
       <div className="max-w-md mx-auto">
-
         <h1 className="text-3xl font-bold text-pink-700 mb-2">Fake Call</h1>
-        <p className="text-gray-500 mb-6">
-          Schedule a fake incoming call to escape unsafe situations discreetly
-        </p>
+        <p className="text-gray-500 mb-6">Schedule a fake incoming call to escape unsafe situations</p>
 
         <div className="bg-white rounded-2xl shadow p-6 flex flex-col gap-5">
-
           <div>
             <label className="text-gray-600 font-medium block mb-2">Caller Name</label>
             <input
@@ -175,13 +160,9 @@ function FakeCall() {
                 <button
                   key={sec}
                   onClick={() => setDelay(sec)}
-                  className={`flex-1 py-2 rounded-lg border font-medium transition ${
-                    delay === sec
-                      ? "bg-pink-600 text-white border-pink-600"
-                      : "bg-white text-gray-600 border-gray-300 hover:border-pink-400"
-                  }`}
+                  className={"flex-1 py-2 rounded-lg border font-medium transition " + (delay === sec ? "bg-pink-600 text-white border-pink-600" : "bg-white text-gray-600 border-gray-300 hover:border-pink-400")}
                 >
-                  {sec < 60 ? `${sec}s` : "1m"}
+                  {sec < 60 ? sec + "s" : "1m"}
                 </button>
               ))}
             </div>
@@ -198,27 +179,18 @@ function FakeCall() {
 
           {status === "waiting" && (
             <div className="flex flex-col items-center gap-3">
-              <p className="text-pink-600 font-semibold text-xl">
-                Call coming in {timeLeft}s...
-              </p>
-              <button
-                onClick={cancelCountdown}
-                className="text-red-500 border border-red-300 px-4 py-2 rounded-lg hover:bg-red-50 transition"
-              >
+              <p className="text-pink-600 font-semibold text-xl">Call coming in {timeLeft}s...</p>
+              <button onClick={cancelCountdown} className="text-red-500 border border-red-300 px-4 py-2 rounded-lg hover:bg-red-50 transition">
                 Cancel
               </button>
             </div>
           )}
-
         </div>
 
         <div className="bg-pink-100 rounded-2xl p-4 mt-6">
           <p className="text-pink-700 font-medium mb-1">How to use:</p>
-          <p className="text-pink-600 text-sm">
-            Set a callers name and delay, then press Schedule. When the call comes in, answer it to pretend you are on a real call and escape the situation safely.
-          </p>
+          <p className="text-pink-600 text-sm">Set a caller name and delay, then press Schedule. When the call comes in, answer it to pretend you are on a real call and escape safely.</p>
         </div>
-
       </div>
     </div>
   );

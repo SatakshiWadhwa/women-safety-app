@@ -13,20 +13,36 @@ function SafePlaces() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [activeType, setActiveType] = useState("hospital");
-
-  useEffect(() => { getLocation(); }, []);
+  const [locationError, setLocationError] = useState("");
 
   useEffect(() => {
-    if (location) { fetchPlaces(activeType); }
+    getLocation();
+  }, []);
+
+  useEffect(() => {
+    if (location) {
+      fetchPlaces(activeType);
+    }
   }, [location, activeType]);
 
   const getLocation = () => {
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        (pos) => setLocation({ latitude: pos.coords.latitude, longitude: pos.coords.longitude }),
-        () => setError("Location access denied. Please enable location to find nearby places.")
-      );
+    setLocationError("");
+    if (!navigator.geolocation) {
+      setLocationError("Geolocation not supported in this browser.");
+      return;
     }
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        setLocation({
+          latitude: pos.coords.latitude,
+          longitude: pos.coords.longitude,
+        });
+      },
+      (err) => {
+        setLocationError("Location access denied. Please enable location and try again.");
+      },
+      { timeout: 10000, enableHighAccuracy: true }
+    );
   };
 
   const fetchPlaces = async (type) => {
@@ -34,11 +50,22 @@ function SafePlaces() {
     setLoading(true);
     setError("");
     setPlaces([]);
+
     try {
       const query = PLACE_TYPES.find((t) => t.id === type)?.query || type;
-      const overpassQuery = `[out:json][timeout:25];(node["amenity"="${query}"](around:3000,${location.latitude},${location.longitude});way["amenity"="${query}"](around:3000,${location.latitude},${location.longitude}););out body;>;out skel qt;`;
-      const response = await fetch("https://overpass-api.de/api/interpreter", { method: "POST", body: overpassQuery });
+      const overpassQuery = `[out:json][timeout:25];(node["amenity"="${query}"](around:5000,${location.latitude},${location.longitude});way["amenity"="${query}"](around:5000,${location.latitude},${location.longitude}););out body;>;out skel qt;`;
+
+      const response = await fetch("https://overpass-api.de/api/interpreter", {
+        method: "POST",
+        body: overpassQuery,
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to fetch places");
+      }
+
       const data = await response.json();
+
       const results = data.elements
         .filter((el) => el.tags && el.tags.name)
         .slice(0, 10)
@@ -50,10 +77,14 @@ function SafePlaces() {
           lat: el.lat || el.center?.lat,
           lon: el.lon || el.center?.lon,
         }));
+
       setPlaces(results);
-      if (results.length === 0) setError("No places found nearby. Try a different category.");
+
+      if (results.length === 0) {
+        setError("No places found nearby. Expanding search area...");
+      }
     } catch (err) {
-      setError("Failed to fetch nearby places. Please try again.");
+      setError("Failed to fetch nearby places. Please check your internet and try again.");
     } finally {
       setLoading(false);
     }
@@ -79,45 +110,78 @@ function SafePlaces() {
         <h1 className="text-3xl font-bold text-pink-700 mb-2">Safe Places</h1>
         <p className="text-gray-500 mb-6">Find nearby hospitals, police stations and more</p>
 
+        {/* Location Status */}
         <div className="bg-white rounded-2xl shadow p-4 mb-6">
           {location ? (
-            <p className="text-green-600 font-medium">Location detected. Searching within 3km radius.</p>
+            <div className="flex justify-between items-center">
+              <p className="text-green-600 font-medium">Location detected</p>
+              <button
+                onClick={() => fetchPlaces(activeType)}
+                className="text-pink-600 text-sm border border-pink-300 px-3 py-1 rounded-lg hover:bg-pink-50"
+              >
+                Refresh
+              </button>
+            </div>
+          ) : locationError ? (
+            <div className="flex justify-between items-center">
+              <p className="text-red-500 text-sm">{locationError}</p>
+              <button
+                onClick={getLocation}
+                className="bg-pink-600 text-white text-sm px-3 py-1 rounded-lg hover:bg-pink-700"
+              >
+                Retry
+              </button>
+            </div>
           ) : (
             <p className="text-yellow-600 font-medium">Getting your location...</p>
           )}
         </div>
 
-        {error && <p className="text-red-500 bg-red-50 p-3 rounded-lg mb-4">{error}</p>}
+        {error && (
+          <div className="bg-yellow-50 border border-yellow-300 p-3 rounded-lg mb-4 flex justify-between items-center">
+            <p className="text-yellow-700 text-sm">{error}</p>
+            <button
+              onClick={() => fetchPlaces(activeType)}
+              className="text-pink-600 text-sm border border-pink-300 px-3 py-1 rounded-lg ml-2"
+            >
+              Retry
+            </button>
+          </div>
+        )}
 
+        {/* Category Tabs */}
         <div className="flex gap-2 overflow-x-auto mb-6 pb-2">
           {PLACE_TYPES.map((type) => (
             <button
               key={type.id}
               onClick={() => setActiveType(type.id)}
-              className={`flex items-center gap-2 px-4 py-2 rounded-full whitespace-nowrap font-medium transition ${
-                activeType === type.id ? "bg-pink-600 text-white" : "bg-white text-gray-600 border border-gray-200 hover:border-pink-400"
-              }`}
+              className={"flex items-center gap-2 px-4 py-2 rounded-full whitespace-nowrap font-medium transition " + (activeType === type.id ? "bg-pink-600 text-white" : "bg-white text-gray-600 border border-gray-200 hover:border-pink-400")}
             >
               {type.icon} {type.label}
             </button>
           ))}
         </div>
 
+        {/* Places List */}
         {loading ? (
           <div className="bg-white rounded-2xl shadow p-8 text-center">
             <p className="text-pink-600 font-medium">Searching nearby places...</p>
+            <p className="text-gray-400 text-sm mt-2">This may take a few seconds</p>
           </div>
         ) : (
           <div className="flex flex-col gap-3">
+            {places.length === 0 && !error && !loading && location && (
+              <div className="bg-white rounded-2xl shadow p-6 text-center text-gray-400">
+                No places found. Try a different category.
+              </div>
+            )}
             {places.map((place) => (
               <div key={place.id} className="bg-white rounded-2xl shadow p-5">
                 <div className="flex justify-between items-start">
                   <div className="flex-1">
                     <p className="font-bold text-gray-800">{place.name}</p>
                     <p className="text-gray-500 text-sm mt-1">{place.address}</p>
-                    {place.phone && (
-                      <p className="text-pink-600 text-sm mt-1">{place.phone}</p>
-                    )}
+                    {place.phone && <p className="text-pink-600 text-sm mt-1">{place.phone}</p>}
                     {place.lat && place.lon && (
                       <p className="text-gray-400 text-xs mt-1">{getDistance(place.lat, place.lon)}</p>
                     )}
