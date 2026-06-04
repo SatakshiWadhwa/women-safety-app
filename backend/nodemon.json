@@ -1,0 +1,5 @@
+{
+  "watch": ["server.js", "models"],
+  "ext": "js",
+  "ignore": ["node_modules"]
+}
