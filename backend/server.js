@@ -18,11 +18,31 @@ import notificationRoutes from "./routes/notificationRoutes.js";
 
 const app = express();
 const httpServer = createServer(app);
+
+const allowedOrigins = [
+  "http://localhost:5173",
+  "https://women-safety-app-sepia.vercel.app",
+];
+
+app.use(cors({
+  origin: function(origin, callback) {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error("Not allowed by CORS"));
+    }
+  },
+  credentials: true,
+}));
+
 const io = new Server(httpServer, {
-  cors: { origin: "*", methods: ["GET", "POST"] }
+  cors: {
+    origin: allowedOrigins,
+    methods: ["GET", "POST"],
+    credentials: true,
+  }
 });
 
-app.use(cors());
 app.use(express.json());
 
 mongoose
@@ -42,30 +62,12 @@ app.use("/api/notifications", notificationRoutes);
 
 io.on("connection", (socket) => {
   console.log("User connected:", socket.id);
-
-  socket.on("join", (userId) => {
-    socket.join(userId);
-  });
-
-  socket.on("new_buddy_request", (data) => {
-    socket.broadcast.emit("buddy_request_update", data);
-  });
-
-  socket.on("location_update", (data) => {
-    socket.broadcast.emit("buddy_location", data);
-  });
-
-  socket.on("panic", (data) => {
-    io.emit("buddy_panic", data);
-  });
-
-  socket.on("walk_completed", (data) => {
-    socket.broadcast.emit("buddy_completed", data);
-  });
-
-  socket.on("disconnect", () => {
-    console.log("User disconnected:", socket.id);
-  });
+  socket.on("join", (userId) => { socket.join(userId); });
+  socket.on("new_buddy_request", (data) => { socket.broadcast.emit("buddy_request_update", data); });
+  socket.on("location_update", (data) => { socket.broadcast.emit("buddy_location", data); });
+  socket.on("panic", (data) => { io.emit("buddy_panic", data); });
+  socket.on("walk_completed", (data) => { socket.broadcast.emit("buddy_completed", data); });
+  socket.on("disconnect", () => { console.log("User disconnected:", socket.id); });
 });
 
 const PORT = process.env.PORT || 5000;
