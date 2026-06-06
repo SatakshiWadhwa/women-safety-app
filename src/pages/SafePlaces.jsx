@@ -1,4 +1,5 @@
 ﻿import { useState, useEffect } from "react";
+import API from "../api/api";
 
 const PLACE_TYPES = [
   { id: "hospital", label: "Hospitals", icon: "🏥", query: "hospital" },
@@ -15,14 +16,10 @@ function SafePlaces() {
   const [activeType, setActiveType] = useState("hospital");
   const [locationError, setLocationError] = useState("");
 
-  useEffect(() => {
-    getLocation();
-  }, []);
+  useEffect(() => { getLocation(); }, []);
 
   useEffect(() => {
-    if (location) {
-      fetchPlaces(activeType);
-    }
+    if (location) { fetchPlaces(activeType); }
   }, [location, activeType]);
 
   const getLocation = () => {
@@ -32,15 +29,8 @@ function SafePlaces() {
       return;
     }
     navigator.geolocation.getCurrentPosition(
-      (pos) => {
-        setLocation({
-          latitude: pos.coords.latitude,
-          longitude: pos.coords.longitude,
-        });
-      },
-      (err) => {
-        setLocationError("Location access denied. Please enable location and try again.");
-      },
+      (pos) => setLocation({ latitude: pos.coords.latitude, longitude: pos.coords.longitude }),
+      () => setLocationError("Location access denied. Please enable location and try again."),
       { timeout: 10000, enableHighAccuracy: true }
     );
   };
@@ -50,41 +40,21 @@ function SafePlaces() {
     setLoading(true);
     setError("");
     setPlaces([]);
-
     try {
       const query = PLACE_TYPES.find((t) => t.id === type)?.query || type;
-      const overpassQuery = `[out:json][timeout:25];(node["amenity"="${query}"](around:5000,${location.latitude},${location.longitude});way["amenity"="${query}"](around:5000,${location.latitude},${location.longitude}););out body;>;out skel qt;`;
-
-      const response = await fetch("https://overpass-api.de/api/interpreter", {
-        method: "POST",
-        body: overpassQuery,
+      const res = await API.get("/places/nearby", {
+        params: {
+          lat: location.latitude,
+          lon: location.longitude,
+          type: query,
+        },
       });
-
-      if (!response.ok) {
-        throw new Error("Failed to fetch places");
-      }
-
-      const data = await response.json();
-
-      const results = data.elements
-        .filter((el) => el.tags && el.tags.name)
-        .slice(0, 10)
-        .map((el) => ({
-          id: el.id,
-          name: el.tags.name,
-          address: el.tags["addr:full"] || el.tags["addr:street"] || "Address not available",
-          phone: el.tags.phone || el.tags["contact:phone"] || null,
-          lat: el.lat || el.center?.lat,
-          lon: el.lon || el.center?.lon,
-        }));
-
-      setPlaces(results);
-
-      if (results.length === 0) {
-        setError("No places found nearby. Expanding search area...");
+      setPlaces(res.data);
+      if (res.data.length === 0) {
+        setError("No places found nearby. Try a different category.");
       }
     } catch (err) {
-      setError("Failed to fetch nearby places. Please check your internet and try again.");
+      setError("Failed to fetch nearby places. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -110,25 +80,18 @@ function SafePlaces() {
         <h1 className="text-3xl font-bold text-pink-700 mb-2">Safe Places</h1>
         <p className="text-gray-500 mb-6">Find nearby hospitals, police stations and more</p>
 
-        {/* Location Status */}
         <div className="bg-white rounded-2xl shadow p-4 mb-6">
           {location ? (
             <div className="flex justify-between items-center">
               <p className="text-green-600 font-medium">Location detected</p>
-              <button
-                onClick={() => fetchPlaces(activeType)}
-                className="text-pink-600 text-sm border border-pink-300 px-3 py-1 rounded-lg hover:bg-pink-50"
-              >
+              <button onClick={() => fetchPlaces(activeType)} className="text-pink-600 text-sm border border-pink-300 px-3 py-1 rounded-lg hover:bg-pink-50">
                 Refresh
               </button>
             </div>
           ) : locationError ? (
             <div className="flex justify-between items-center">
               <p className="text-red-500 text-sm">{locationError}</p>
-              <button
-                onClick={getLocation}
-                className="bg-pink-600 text-white text-sm px-3 py-1 rounded-lg hover:bg-pink-700"
-              >
+              <button onClick={getLocation} className="bg-pink-600 text-white text-sm px-3 py-1 rounded-lg">
                 Retry
               </button>
             </div>
@@ -140,16 +103,12 @@ function SafePlaces() {
         {error && (
           <div className="bg-yellow-50 border border-yellow-300 p-3 rounded-lg mb-4 flex justify-between items-center">
             <p className="text-yellow-700 text-sm">{error}</p>
-            <button
-              onClick={() => fetchPlaces(activeType)}
-              className="text-pink-600 text-sm border border-pink-300 px-3 py-1 rounded-lg ml-2"
-            >
+            <button onClick={() => fetchPlaces(activeType)} className="text-pink-600 text-sm border border-pink-300 px-3 py-1 rounded-lg ml-2">
               Retry
             </button>
           </div>
         )}
 
-        {/* Category Tabs */}
         <div className="flex gap-2 overflow-x-auto mb-6 pb-2">
           {PLACE_TYPES.map((type) => (
             <button
@@ -162,7 +121,6 @@ function SafePlaces() {
           ))}
         </div>
 
-        {/* Places List */}
         {loading ? (
           <div className="bg-white rounded-2xl shadow p-8 text-center">
             <p className="text-pink-600 font-medium">Searching nearby places...</p>

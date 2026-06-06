@@ -1,4 +1,4 @@
-﻿import dotenv from "dotenv";
+import dotenv from "dotenv";
 import { fileURLToPath } from "url";
 import { dirname, join } from "path";
 const __filename = fileURLToPath(import.meta.url);
@@ -15,6 +15,7 @@ import sosRoutes from "./routes/sosRoutes.js";
 import aiRoutes from "./routes/aiRoutes.js";
 import buddyRoutes from "./routes/buddyRoutes.js";
 import notificationRoutes from "./routes/notificationRoutes.js";
+import placesRoutes from "./routes/placesRoutes.js";
 
 const app = express();
 const httpServer = createServer(app);
@@ -59,6 +60,7 @@ app.use("/api/sos", sosRoutes);
 app.use("/api/ai", aiRoutes);
 app.use("/api/buddy", buddyRoutes);
 app.use("/api/notifications", notificationRoutes);
+app.use("/api/places", placesRoutes);
 
 io.on("connection", (socket) => {
   console.log("User connected:", socket.id);
