@@ -33,7 +33,7 @@ function Login() {
     <div className="min-h-screen flex items-center justify-center bg-pink-50">
       <div className="bg-white p-8 rounded-2xl shadow-lg w-full max-w-md">
         <h1 className="text-3xl font-bold text-pink-700 mb-6 text-center">Welcome Back</h1>
-        {error && <p className="text-red-500 text-sm mb-4 text-center">{error}</p>}
+        {error && <p className="text-red-500 text-sm mb-4 text-center bg-red-50 p-3 rounded-lg">{error}</p>}
         <form onSubmit={handleLogin} className="flex flex-col gap-4">
           <input
             type="email"
@@ -53,11 +53,12 @@ function Login() {
             className="border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:border-pink-500"
             required
           />
-          <button
-            type="submit"
-            disabled={loading}
-            className="bg-pink-600 text-white py-2 rounded-lg hover:bg-pink-700 transition"
-          >
+          <div className="text-right">
+            <Link to="/forgot-password" className="text-pink-600 text-sm hover:underline">
+              Forgot Password?
+            </Link>
+          </div>
+          <button type="submit" disabled={loading} className="bg-pink-600 text-white py-2 rounded-lg hover:bg-pink-700 transition">
             {loading ? "Logging in..." : "Login"}
           </button>
         </form>
