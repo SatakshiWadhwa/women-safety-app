@@ -1,11 +1,11 @@
-﻿import { Resend } from "resend";
+﻿import sgMail from "@sendgrid/mail";
 
 const sendEmail = async (to, subject, html) => {
-  const resend = new Resend(process.env.RESEND_API_KEY);
+  sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
-  await resend.emails.send({
-    from: "SafeCampus <onboarding@resend.dev>",
+  await sgMail.send({
     to,
+    from: "satakshiwadhwa23@gmail.com",
     subject,
     html,
   });
