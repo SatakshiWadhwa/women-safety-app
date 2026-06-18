@@ -1,1 +1,65 @@
-@import "tailwindcss";
+﻿@import "tailwindcss";
+
+@theme {
+  --color-ink: #161324;
+  --color-ink-light: #221d3a;
+  --color-beacon: #ff4d6d;
+  --color-beacon-dark: #e23a5a;
+  --color-dusk: #6c63ff;
+  --color-dusk-light: #8e87ff;
+  --color-paper: #fbf8fa;
+  --color-slate: #5b5770;
+  --color-signal: #1fcb8f;
+
+  --font-display: "Fraunces", serif;
+  --font-sans: "Inter", system-ui, sans-serif;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: var(--font-sans);
+  background-color: var(--color-paper);
+  color: var(--color-ink);
+}
+
+.font-display {
+  font-family: var(--font-display);
+}
+
+@keyframes beacon-pulse {
+  0% {
+    transform: scale(1);
+    opacity: 0.55;
+  }
+  70% {
+    transform: scale(1.9);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(1.9);
+    opacity: 0;
+  }
+}
+
+.beacon-ring {
+  position: absolute;
+  inset: 0;
+  border-radius: 9999px;
+  background: var(--color-beacon);
+  animation: beacon-pulse 2.4s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+.beacon-ring.delay {
+  animation-delay: 1.2s;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .beacon-ring {
+    animation: none;
+    display: none;
+  }
+}
+

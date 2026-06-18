@@ -1,42 +1,46 @@
-ï»¿import { Link } from "react-router-dom";
+import { Link } from "react-router-dom";
+import Icon from "./Icon";
 
 function Footer() {
   return (
-    <footer className="bg-gray-900 text-white py-12 px-6">
-      <div className="max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-8">
+    <footer className="bg-ink text-white pt-16 pb-8 px-6">
+      <div className="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-10 mb-10">
 
         <div>
-          <h2 className="text-2xl font-bold text-pink-400 mb-3">SafeCampus</h2>
-          <p className="text-gray-400 text-sm leading-relaxed">
-            A complete women safety platform for college and hostel students in India.
+          <p className="font-display text-xl mb-3 flex items-center gap-2">
+            <span className="w-6 h-6 rounded-full bg-beacon flex items-center justify-center text-xs">???</span>
+            SafeCampus
+          </p>
+          <p className="text-white/50 text-sm leading-relaxed">
+            A safety companion built for college and hostel students across India.
           </p>
         </div>
 
         <div>
-          <h3 className="text-lg font-bold mb-4">Quick Links</h3>
-          <ul className="flex flex-col gap-2 text-gray-400">
-            <li><Link to="/" className="hover:text-pink-400 transition">Home</Link></li>
-            <li><Link to="/dashboard" className="hover:text-pink-400 transition">Dashboard</Link></li>
-            <li><Link to="/sos" className="hover:text-pink-400 transition">SOS Emergency</Link></li>
-            <li><Link to="/safe-places" className="hover:text-pink-400 transition">Safe Places</Link></li>
-            <li><Link to="/self-defense" className="hover:text-pink-400 transition">Self Defense</Link></li>
+          <p className="text-white/40 text-xs font-semibold tracking-wide uppercase mb-4">Quick links</p>
+          <ul className="flex flex-col gap-2.5 text-white/70 text-sm">
+            <li><Link to="/" className="hover:text-white transition">Home</Link></li>
+            <li><Link to="/dashboard" className="hover:text-white transition">Dashboard</Link></li>
+            <li><Link to="/sos" className="hover:text-white transition">SOS Emergency</Link></li>
+            <li><Link to="/safe-places" className="hover:text-white transition">Safe Places</Link></li>
+            <li><Link to="/self-defense" className="hover:text-white transition">Self Defense</Link></li>
           </ul>
         </div>
 
         <div>
-          <h3 className="text-lg font-bold mb-4">Emergency</h3>
-          <ul className="flex flex-col gap-2 text-gray-400">
-            <li><a href="tel:112" className="hover:text-pink-400 transition">112 â€” National Emergency</a></li>
-            <li><a href="tel:100" className="hover:text-pink-400 transition">100 â€” Police</a></li>
-            <li><a href="tel:1091" className="hover:text-pink-400 transition">1091 â€” Women Helpline</a></li>
-            <li><a href="tel:108" className="hover:text-pink-400 transition">108 â€” Ambulance</a></li>
+          <p className="text-white/40 text-xs font-semibold tracking-wide uppercase mb-4">In an emergency</p>
+          <ul className="flex flex-col gap-2.5 text-sm">
+            <li><a href="tel:112" className="text-beacon hover:text-beacon-dark transition font-medium">112 — National Emergency</a></li>
+            <li><a href="tel:100" className="text-white/70 hover:text-white transition">100 — Police</a></li>
+            <li><a href="tel:1091" className="text-white/70 hover:text-white transition">1091 — Women Helpline</a></li>
+            <li><a href="tel:108" className="text-white/70 hover:text-white transition">108 — Ambulance</a></li>
           </ul>
         </div>
 
       </div>
 
-      <div className="max-w-4xl mx-auto mt-8 pt-6 border-t border-gray-700 text-center text-gray-500 text-sm">
-        SafeCampus â€” Built for Women Safety
+      <div className="max-w-5xl mx-auto pt-6 border-t border-white/10 text-center text-white/30 text-xs">
+        SafeCampus — built for women`s safety
       </div>
     </footer>
   );

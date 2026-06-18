@@ -11,7 +11,14 @@ router.get("/nearby", protect, async (req, res) => {
       return res.status(400).json({ message: "lat, lon and type are required" });
     }
 
-    const url = `https://nominatim.openstreetmap.org/search?q=${type}&lat=${lat}&lon=${lon}&format=json&limit=10&addressdetails=1`;
+    const latNum = parseFloat(lat);
+    const lonNum = parseFloat(lon);
+
+    // Build a tight bounding box (~6km) around the user so results stay local
+    const delta = 0.06;
+    const viewbox = `${lonNum - delta},${latNum + delta},${lonNum + delta},${latNum - delta}`;
+
+    const url = `https://nominatim.openstreetmap.org/search?q=${type}&format=json&limit=15&addressdetails=1&bounded=1&viewbox=${viewbox}`;
 
     const response = await fetch(url, {
       headers: {
@@ -25,14 +32,27 @@ router.get("/nearby", protect, async (req, res) => {
 
     const data = await response.json();
 
-    const results = data.map((place) => ({
-      id: place.place_id,
-      name: place.display_name.split(",")[0],
-      address: place.display_name,
-      phone: null,
-      lat: parseFloat(place.lat),
-      lon: parseFloat(place.lon),
-    }));
+    // Safety net: drop anything outside a ~10km straight-line radius
+    const toRad = (v) => (v * Math.PI) / 180;
+    const distanceKm = (lat1, lon1, lat2, lon2) => {
+      const R = 6371;
+      const dLat = toRad(lat2 - lat1);
+      const dLon = toRad(lon2 - lon1);
+      const a = Math.sin(dLat / 2) ** 2 + Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLon / 2) ** 2;
+      return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    };
+
+    const results = data
+      .map((place) => ({
+        id: place.place_id,
+        name: place.display_name.split(",")[0],
+        address: place.display_name,
+        phone: null,
+        lat: parseFloat(place.lat),
+        lon: parseFloat(place.lon),
+      }))
+      .filter((place) => distanceKm(latNum, lonNum, place.lat, place.lon) <= 10)
+      .sort((a, b) => distanceKm(latNum, lonNum, a.lat, a.lon) - distanceKm(latNum, lonNum, b.lat, b.lon));
 
     res.json(results);
   } catch (error) {

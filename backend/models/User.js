@@ -11,6 +11,7 @@ const userSchema = new mongoose.Schema(
     collegeDetails: { type: String, default: "" },
     medicalInfo: { type: String, default: "" },
     profilePhoto: { type: String, default: "" },
+    secretCode: { type: String, default: "homework" },
     emergencyContacts: [
       {
         name: String,
