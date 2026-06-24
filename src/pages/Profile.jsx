@@ -175,7 +175,7 @@ function Profile() {
               </button>
             </div>
             <p className="text-gray-400 text-xs">
-              Choose something only you would think to type — a default word like "homework" is set until you change it. At least 4 characters.
+              Choose something only you would think to type - a default word like "homework" is set until you change it. At least 4 characters.
             </p>
           </div>
 

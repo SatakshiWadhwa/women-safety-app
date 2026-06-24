@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+ï»¿import { Link } from "react-router-dom";
 import Icon from "./Icon";
 
 function Footer() {
@@ -8,7 +8,9 @@ function Footer() {
 
         <div>
           <p className="font-display text-xl mb-3 flex items-center gap-2">
-            <span className="w-6 h-6 rounded-full bg-beacon flex items-center justify-center text-xs">???</span>
+            <span className="w-6 h-6 rounded-full bg-beacon flex items-center justify-center">
+              <Icon name="shield" className="w-3.5 h-3.5 text-white" strokeWidth={2} />
+            </span>
             SafeCampus
           </p>
           <p className="text-white/50 text-sm leading-relaxed">
@@ -30,17 +32,17 @@ function Footer() {
         <div>
           <p className="text-white/40 text-xs font-semibold tracking-wide uppercase mb-4">In an emergency</p>
           <ul className="flex flex-col gap-2.5 text-sm">
-            <li><a href="tel:112" className="text-beacon hover:text-beacon-dark transition font-medium">112 — National Emergency</a></li>
-            <li><a href="tel:100" className="text-white/70 hover:text-white transition">100 — Police</a></li>
-            <li><a href="tel:1091" className="text-white/70 hover:text-white transition">1091 — Women Helpline</a></li>
-            <li><a href="tel:108" className="text-white/70 hover:text-white transition">108 — Ambulance</a></li>
+            <li><a href="tel:112" className="text-beacon hover:text-beacon-dark transition font-medium">112 - National Emergency</a></li>
+            <li><a href="tel:100" className="text-white/70 hover:text-white transition">100 - Police</a></li>
+            <li><a href="tel:1091" className="text-white/70 hover:text-white transition">1091 - Women Helpline</a></li>
+            <li><a href="tel:108" className="text-white/70 hover:text-white transition">108 - Ambulance</a></li>
           </ul>
         </div>
 
       </div>
 
       <div className="max-w-5xl mx-auto pt-6 border-t border-white/10 text-center text-white/30 text-xs">
-        SafeCampus — built for women`s safety
+        SafeCampus - built for women safety
       </div>
     </footer>
   );

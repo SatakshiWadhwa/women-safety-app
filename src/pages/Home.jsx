@@ -54,7 +54,7 @@ function Home() {
             </h1>
 
             <p className="text-white/70 text-lg max-w-xl mb-10 leading-relaxed">
-              SafeCampus puts an SOS signal, a verified walking buddy, and a calm AI guide in one place — ready before you ever need them.
+              SafeCampus puts an SOS signal, a verified walking buddy, and a calm AI guide in one place - ready before you ever need them.
             </p>
 
             <div className="flex gap-4 flex-wrap justify-center">
@@ -128,7 +128,7 @@ function Home() {
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
             {[
-              { title: "Create your account", desc: "Sign up with your email and a strong password — takes under a minute." },
+              { title: "Create your account", desc: "Sign up with your email and a strong password - takes under a minute." },
               { title: "Add who to alert", desc: "Save emergency contacts so help knows exactly where to go." },
               { title: "Carry it with you", desc: "SOS, Buddy and the AI guide are one tap away whenever you need them." },
             ].map((item, index) => (

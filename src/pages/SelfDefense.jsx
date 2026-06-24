@@ -24,7 +24,7 @@ const CATEGORIES = [
       { title: "Avoid Distractions", description: "Stay off your phone while walking alone. Attackers target people who are distracted. Keep your head up and be aware of surroundings.", tip: "No headphones in both ears" },
       { title: "Know Your Exits", description: "Whenever you enter a new place, immediately identify the exits. This habit can save your life in emergencies.", tip: "Always know two exit routes" },
       { title: "Walk Confidently", description: "Attackers target people who look uncertain or vulnerable. Walk with purpose, head up, and make brief eye contact to show confidence.", tip: "Confident posture deters attackers" },
-      { title: "Safe Zones", description: "Know the safe zones on your campus — security booths, 24hr shops, populated areas. Plan your routes to pass through them.", tip: "Map safe zones near you" },
+      { title: "Safe Zones", description: "Know the safe zones on your campus - security booths, 24hr shops, populated areas. Plan your routes to pass through them.", tip: "Map safe zones near you" },
     ],
   },
   {

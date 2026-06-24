@@ -235,7 +235,7 @@ function SOS() {
                       >
                         <div className="text-left">
                           <p className="font-semibold text-ink">{contact.name}</p>
-                          <p className="text-slate text-xs">{contact.relation} — {contact.phone}</p>
+                          <p className="text-slate text-xs">{contact.relation} - {contact.phone}</p>
                         </div>
                         <Icon name="chat" className="w-5 h-5" />
                       </button>
