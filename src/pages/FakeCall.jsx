@@ -1,4 +1,5 @@
 ﻿import { useState, useEffect, useRef } from "react";
+import Icon from "../components/Icon";
 
 function FakeCall() {
   const [callerName, setCallerName] = useState("Mom");
@@ -97,20 +98,20 @@ function FakeCall() {
 
   if (status === "ringing") {
     return (
-      <div className="min-h-screen bg-gray-900 flex flex-col items-center justify-between py-16 px-6">
+      <div className="min-h-screen bg-ink flex flex-col items-center justify-between py-16 px-6">
         <div className="flex flex-col items-center gap-4 mt-10">
-          <div className="w-24 h-24 rounded-full bg-pink-500 flex items-center justify-center text-4xl text-white font-bold shadow-lg animate-pulse">
+          <div className="w-24 h-24 rounded-full bg-beacon flex items-center justify-center text-4xl text-white font-display shadow-lg animate-pulse">
             {callerName.charAt(0).toUpperCase()}
           </div>
-          <h2 className="text-white text-3xl font-bold">{callerName}</h2>
-          <p className="text-gray-400 text-lg">Incoming Call...</p>
+          <h2 className="font-display text-white text-3xl">{callerName}</h2>
+          <p className="text-white/50 text-lg">Incoming call...</p>
         </div>
         <div className="flex gap-16 mb-10">
-          <button onClick={endCall} className="w-16 h-16 rounded-full bg-red-500 flex items-center justify-center text-white text-2xl shadow-lg hover:bg-red-600">
-            ✕
+          <button onClick={endCall} className="w-16 h-16 rounded-full bg-beacon flex items-center justify-center text-white shadow-lg hover:bg-beacon-dark transition">
+            <Icon name="close" className="w-6 h-6" strokeWidth={2.2} />
           </button>
-          <button onClick={answerCall} className="w-16 h-16 rounded-full bg-green-500 flex items-center justify-center text-white text-2xl shadow-lg hover:bg-green-600">
-            ✆
+          <button onClick={answerCall} className="w-16 h-16 rounded-full bg-signal flex items-center justify-center text-white shadow-lg hover:opacity-90 transition">
+            <Icon name="phone" className="w-6 h-6" strokeWidth={2} />
           </button>
         </div>
       </div>
@@ -119,48 +120,48 @@ function FakeCall() {
 
   if (status === "ongoing") {
     return (
-      <div className="min-h-screen bg-gray-900 flex flex-col items-center justify-between py-16 px-6">
+      <div className="min-h-screen bg-ink flex flex-col items-center justify-between py-16 px-6">
         <div className="flex flex-col items-center gap-4 mt-10">
-          <div className="w-24 h-24 rounded-full bg-pink-500 flex items-center justify-center text-4xl text-white font-bold shadow-lg">
+          <div className="w-24 h-24 rounded-full bg-beacon flex items-center justify-center text-4xl text-white font-display shadow-lg">
             {callerName.charAt(0).toUpperCase()}
           </div>
-          <h2 className="text-white text-3xl font-bold">{callerName}</h2>
-          <p className="text-green-400 text-lg">{formatTime(callDuration)}</p>
-          <p className="text-gray-400 text-sm">Ongoing call...</p>
+          <h2 className="font-display text-white text-3xl">{callerName}</h2>
+          <p className="text-signal text-lg">{formatTime(callDuration)}</p>
+          <p className="text-white/50 text-sm">Ongoing call...</p>
         </div>
-        <button onClick={endCall} className="w-16 h-16 rounded-full bg-red-500 flex items-center justify-center text-white text-2xl shadow-lg hover:bg-red-600 mb-10">
-          ✕
+        <button onClick={endCall} className="w-16 h-16 rounded-full bg-beacon flex items-center justify-center text-white shadow-lg hover:bg-beacon-dark transition mb-10">
+          <Icon name="close" className="w-6 h-6" strokeWidth={2.2} />
         </button>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-pink-50 p-6">
+    <div className="min-h-screen bg-paper p-6">
       <div className="max-w-md mx-auto">
-        <h1 className="text-3xl font-bold text-pink-700 mb-2">Fake Call</h1>
-        <p className="text-gray-500 mb-6">Schedule a fake incoming call to escape unsafe situations</p>
+        <h1 className="font-display text-3xl text-ink mb-2">Fake Call</h1>
+        <p className="text-slate mb-6">Schedule a believable incoming call to exit a situation fast</p>
 
-        <div className="bg-white rounded-2xl shadow p-6 flex flex-col gap-5">
+        <div className="bg-white rounded-2xl shadow-sm border border-slate/10 p-6 flex flex-col gap-5">
           <div>
-            <label className="text-gray-600 font-medium block mb-2">Caller Name</label>
+            <label className="text-slate text-sm font-medium block mb-2">Caller name</label>
             <input
               type="text"
               value={callerName}
               onChange={(e) => setCallerName(e.target.value)}
               placeholder="e.g. Mom, Friend, Boss"
-              className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:border-pink-500"
+              className="w-full border border-slate/20 rounded-lg px-4 py-2.5 focus:outline-none focus:border-dusk transition"
             />
           </div>
 
           <div>
-            <label className="text-gray-600 font-medium block mb-2">Call me in</label>
+            <label className="text-slate text-sm font-medium block mb-2">Call me in</label>
             <div className="flex gap-3">
               {[5, 10, 30, 60].map((sec) => (
                 <button
                   key={sec}
                   onClick={() => setDelay(sec)}
-                  className={"flex-1 py-2 rounded-lg border font-medium transition " + (delay === sec ? "bg-pink-600 text-white border-pink-600" : "bg-white text-gray-600 border-gray-300 hover:border-pink-400")}
+                  className={"flex-1 py-2 rounded-lg border font-medium transition text-sm " + (delay === sec ? "bg-ink text-white border-ink" : "bg-white text-slate border-slate/20 hover:border-ink/30")}
                 >
                   {sec < 60 ? sec + "s" : "1m"}
                 </button>
@@ -171,25 +172,25 @@ function FakeCall() {
           {status === "idle" && (
             <button
               onClick={startCountdown}
-              className="bg-pink-600 text-white py-3 rounded-xl hover:bg-pink-700 transition font-semibold text-lg"
+              className="bg-beacon text-white py-3.5 rounded-full hover:bg-beacon-dark transition font-semibold shadow-lg shadow-beacon/20"
             >
-              Schedule Fake Call
+              Schedule fake call
             </button>
           )}
 
           {status === "waiting" && (
             <div className="flex flex-col items-center gap-3">
-              <p className="text-pink-600 font-semibold text-xl">Call coming in {timeLeft}s...</p>
-              <button onClick={cancelCountdown} className="text-red-500 border border-red-300 px-4 py-2 rounded-lg hover:bg-red-50 transition">
+              <p className="font-display text-dusk text-xl">Call coming in {timeLeft}s...</p>
+              <button onClick={cancelCountdown} className="text-beacon border border-beacon/30 px-4 py-2 rounded-full hover:bg-beacon/5 transition text-sm">
                 Cancel
               </button>
             </div>
           )}
         </div>
 
-        <div className="bg-pink-100 rounded-2xl p-4 mt-6">
-          <p className="text-pink-700 font-medium mb-1">How to use:</p>
-          <p className="text-pink-600 text-sm">Set a caller name and delay, then press Schedule. When the call comes in, answer it to pretend you are on a real call and escape safely.</p>
+        <div className="bg-dusk/5 border border-dusk/15 rounded-2xl p-4 mt-6">
+          <p className="text-ink font-medium text-sm mb-1">How to use</p>
+          <p className="text-slate text-sm leading-relaxed">Set a caller name and delay, then press Schedule. When the call comes in, answer it to pretend you are on a real call and exit safely.</p>
         </div>
       </div>
     </div>

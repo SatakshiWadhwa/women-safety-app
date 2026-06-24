@@ -1,8 +1,9 @@
-import { useState, useEffect, useRef } from "react";
+﻿import { useState, useEffect, useRef } from "react";
 import { useAuth } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
 import API from "../api/api";
 import { io } from "socket.io-client";
+import Icon from "../components/Icon";
 
 const socket = io("https://safecampus-backend-4c6u.onrender.com");
 
@@ -37,7 +38,7 @@ function NightWalkBuddy() {
     });
 
     socket.on("buddy_panic", (data) => {
-      alert(`PANIC ALERT from ${data.userName}: ${data.message}`);
+      alert("PANIC ALERT from " + data.userName + ": " + data.message);
     });
 
     socket.on("buddy_completed", () => {
@@ -95,7 +96,7 @@ function NightWalkBuddy() {
 
   const handleJoin = async (id) => {
     try {
-      const res = await API.put(`/buddy/join/${id}`);
+      const res = await API.put("/buddy/join/" + id);
       setActiveWalk(res.data.request);
       setMessage("Buddy matched! Walk together safely.");
       startLocationSharing();
@@ -107,7 +108,7 @@ function NightWalkBuddy() {
 
   const handleComplete = async (id) => {
     try {
-      await API.put(`/buddy/complete/${id}`);
+      await API.put("/buddy/complete/" + id);
       setActiveWalk(null);
       setPanicSent(false);
       if (locationRef.current) clearInterval(locationRef.current);
@@ -121,7 +122,7 @@ function NightWalkBuddy() {
 
   const handleCancel = async (id) => {
     try {
-      await API.put(`/buddy/cancel/${id}`);
+      await API.put("/buddy/cancel/" + id);
       setMessage("Request cancelled");
       fetchMyRequests();
     } catch (err) {
@@ -154,86 +155,72 @@ function NightWalkBuddy() {
     }
   };
 
+  const statusStyle = {
+    open: "bg-dusk/10 text-dusk",
+    matched: "bg-signal/10 text-signal",
+    completed: "bg-slate/10 text-slate",
+    cancelled: "bg-beacon/10 text-beacon",
+  };
+
   return (
-    <div className="min-h-screen bg-pink-50 p-6">
+    <div className="min-h-screen bg-paper p-6">
       <div className="max-w-2xl mx-auto">
 
-        <h1 className="text-3xl font-bold text-pink-700 mb-2">Night Walk Buddy</h1>
-        <p className="text-gray-500 mb-6">Find a verified student to walk with you safely</p>
+        <h1 className="font-display text-3xl text-ink mb-2">Night Walk Buddy</h1>
+        <p className="text-slate mb-6">Find a verified student to walk with you safely</p>
 
         {message && (
-          <p className="bg-pink-100 text-pink-700 p-3 rounded-lg mb-4">{message}</p>
+          <p className="bg-dusk/8 text-dusk p-3 rounded-lg mb-4 text-sm">{message}</p>
         )}
 
-        {/* Active Walk Banner */}
         {activeWalk && (
-          <div className="bg-green-50 border border-green-300 rounded-2xl p-4 mb-6">
-            <h2 className="text-green-700 font-bold text-lg mb-1">Walk in Progress</h2>
-            <p className="text-green-600 text-sm">
-              {activeWalk.from} ? {activeWalk.to}
+          <div className="bg-signal/8 border border-signal/25 rounded-2xl p-5 mb-6">
+            <h2 className="text-signal font-display text-lg mb-1">Walk in progress</h2>
+            <p className="text-slate text-sm flex items-center gap-1.5">
+              {activeWalk.from} <Icon name="arrow" className="w-3.5 h-3.5" strokeWidth={2} /> {activeWalk.to}
             </p>
             <div className="flex gap-3 mt-3">
-              <button
-                onClick={() => handleComplete(activeWalk._id)}
-                className="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600 transition"
-              >
-                Mark Safe Arrival
+              <button onClick={() => handleComplete(activeWalk._id)} className="bg-signal text-white px-4 py-2 rounded-full hover:opacity-90 transition text-sm font-medium">
+                Mark safe arrival
               </button>
-              <button
-                onClick={handlePanic}
-                className="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition"
-              >
-                PANIC
+              <button onClick={handlePanic} className="bg-beacon text-white px-4 py-2 rounded-full hover:bg-beacon-dark transition text-sm font-medium">
+                Panic
               </button>
             </div>
           </div>
         )}
 
-        {/* Tabs */}
         <div className="flex gap-2 mb-6">
           {["find", "post", "my"].map((t) => (
             <button
               key={t}
               onClick={() => setTab(t)}
-              className={`px-4 py-2 rounded-full font-medium transition ${
-                tab === t
-                  ? "bg-pink-600 text-white"
-                  : "bg-white text-gray-600 border border-gray-200 hover:border-pink-400"
-              }`}
+              className={"px-4 py-2.5 rounded-full font-medium transition text-sm " + (tab === t ? "bg-ink text-white" : "bg-white text-slate border border-slate/15 hover:border-ink/30")}
             >
-              {t === "find" ? "Find Buddy" : t === "post" ? "Post Walk" : "My Requests"}
+              {t === "find" ? "Find buddy" : t === "post" ? "Post walk" : "My requests"}
             </button>
           ))}
         </div>
 
-        {/* FIND BUDDY TAB */}
         {tab === "find" && (
           <div className="flex flex-col gap-3">
             {requests.length === 0 ? (
-              <div className="bg-white rounded-2xl shadow p-6 text-center text-gray-400">
-                No walk requests available right now. Check back later or post your own!
+              <div className="bg-white rounded-2xl shadow-sm border border-slate/10 p-6 text-center text-slate text-sm">
+                No walk requests available right now. Check back later or post your own.
               </div>
             ) : (
               requests.map((req) => (
-                <div key={req._id} className="bg-white rounded-2xl shadow p-5">
-                  <div className="flex justify-between items-start">
+                <div key={req._id} className="bg-white rounded-2xl shadow-sm border border-slate/10 p-5">
+                  <div className="flex justify-between items-start gap-3">
                     <div>
-                      <p className="font-bold text-pink-700 text-lg">{req.userName}</p>
-                      <p className="text-gray-600 mt-1">
-                        From: <span className="font-medium">{req.from}</span>
+                      <p className="font-display text-lg text-ink">{req.userName}</p>
+                      <p className="text-slate text-sm mt-1 flex items-center gap-1.5">
+                        {req.from} <Icon name="arrow" className="w-3.5 h-3.5" strokeWidth={2} /> {req.to}
                       </p>
-                      <p className="text-gray-600">
-                        To: <span className="font-medium">{req.to}</span>
-                      </p>
-                      <p className="text-gray-500 text-sm mt-1">
-                        Departure: {req.departureTime}
-                      </p>
+                      <p className="text-slate text-xs mt-1">Departure: {req.departureTime}</p>
                     </div>
-                    <button
-                      onClick={() => handleJoin(req._id)}
-                      className="bg-pink-600 text-white px-4 py-2 rounded-lg hover:bg-pink-700 transition"
-                    >
-                      Join Walk
+                    <button onClick={() => handleJoin(req._id)} className="bg-dusk text-white px-4 py-2 rounded-full hover:bg-dusk-light transition text-sm font-medium whitespace-nowrap">
+                      Join walk
                     </button>
                   </div>
                 </div>
@@ -242,17 +229,16 @@ function NightWalkBuddy() {
           </div>
         )}
 
-        {/* POST WALK TAB */}
         {tab === "post" && (
-          <div className="bg-white rounded-2xl shadow p-6">
-            <h2 className="text-xl font-semibold text-pink-600 mb-4">Post a Walk Request</h2>
+          <div className="bg-white rounded-2xl shadow-sm border border-slate/10 p-6">
+            <h2 className="font-display text-lg text-ink mb-4">Post a walk request</h2>
             <form onSubmit={handlePost} className="flex flex-col gap-4">
               <input
                 type="text"
                 placeholder="Starting from (e.g. Hostel Block A)"
                 value={form.from}
                 onChange={(e) => setForm({ ...form, from: e.target.value })}
-                className="border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:border-pink-500"
+                className="border border-slate/20 rounded-lg px-4 py-2.5 focus:outline-none focus:border-dusk transition"
                 required
               />
               <input
@@ -260,70 +246,51 @@ function NightWalkBuddy() {
                 placeholder="Going to (e.g. Library, Metro Station)"
                 value={form.to}
                 onChange={(e) => setForm({ ...form, to: e.target.value })}
-                className="border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:border-pink-500"
+                className="border border-slate/20 rounded-lg px-4 py-2.5 focus:outline-none focus:border-dusk transition"
                 required
               />
               <input
                 type="time"
                 value={form.departureTime}
                 onChange={(e) => setForm({ ...form, departureTime: e.target.value })}
-                className="border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:border-pink-500"
+                className="border border-slate/20 rounded-lg px-4 py-2.5 focus:outline-none focus:border-dusk transition"
                 required
               />
-              <button
-                type="submit"
-                disabled={loading}
-                className="bg-pink-600 text-white py-3 rounded-xl hover:bg-pink-700 transition font-semibold"
-              >
-                {loading ? "Posting..." : "Post Walk Request"}
+              <button type="submit" disabled={loading} className="bg-dusk text-white py-3 rounded-full hover:bg-dusk-light transition font-semibold">
+                {loading ? "Posting..." : "Post walk request"}
               </button>
             </form>
           </div>
         )}
 
-        {/* MY REQUESTS TAB */}
         {tab === "my" && (
           <div className="flex flex-col gap-3">
             {myRequests.length === 0 ? (
-              <div className="bg-white rounded-2xl shadow p-6 text-center text-gray-400">
+              <div className="bg-white rounded-2xl shadow-sm border border-slate/10 p-6 text-center text-slate text-sm">
                 You have not posted any walk requests yet.
               </div>
             ) : (
               myRequests.map((req) => (
-                <div key={req._id} className="bg-white rounded-2xl shadow p-5">
-                  <div className="flex justify-between items-start">
+                <div key={req._id} className="bg-white rounded-2xl shadow-sm border border-slate/10 p-5">
+                  <div className="flex justify-between items-start gap-3">
                     <div>
-                      <p className="text-gray-600">
-                        From: <span className="font-medium">{req.from}</span>
+                      <p className="text-slate text-sm flex items-center gap-1.5">
+                        {req.from} <Icon name="arrow" className="w-3.5 h-3.5" strokeWidth={2} /> {req.to}
                       </p>
-                      <p className="text-gray-600">
-                        To: <span className="font-medium">{req.to}</span>
-                      </p>
-                      <p className="text-gray-500 text-sm">Departure: {req.departureTime}</p>
+                      <p className="text-slate text-xs mt-1">Departure: {req.departureTime}</p>
                     </div>
-                    <span className={`px-3 py-1 rounded-full text-sm font-medium ${
-                      req.status === "open" ? "bg-blue-100 text-blue-600" :
-                      req.status === "matched" ? "bg-green-100 text-green-600" :
-                      req.status === "completed" ? "bg-gray-100 text-gray-600" :
-                      "bg-red-100 text-red-600"
-                    }`}>
+                    <span className={"px-3 py-1 rounded-full text-xs font-medium whitespace-nowrap " + (statusStyle[req.status] || statusStyle.open)}>
                       {req.status}
                     </span>
                   </div>
                   {req.status === "open" && (
-                    <button
-                      onClick={() => handleCancel(req._id)}
-                      className="mt-3 text-red-500 text-sm border border-red-300 px-3 py-1 rounded-lg hover:bg-red-50 transition"
-                    >
-                      Cancel Request
+                    <button onClick={() => handleCancel(req._id)} className="mt-3 text-beacon text-sm border border-beacon/30 px-3 py-1.5 rounded-full hover:bg-beacon/5 transition">
+                      Cancel request
                     </button>
                   )}
                   {req.status === "matched" && (
-                    <button
-                      onClick={() => handleComplete(req._id)}
-                      className="mt-3 bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600 transition"
-                    >
-                      Mark Safe Arrival
+                    <button onClick={() => handleComplete(req._id)} className="mt-3 bg-signal text-white px-4 py-2 rounded-full hover:opacity-90 transition text-sm font-medium">
+                      Mark safe arrival
                     </button>
                   )}
                 </div>

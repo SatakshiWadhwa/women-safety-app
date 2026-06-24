@@ -1,5 +1,6 @@
-import { useState, useEffect, useRef } from "react";
+﻿import { useState, useEffect, useRef } from "react";
 import API from "../api/api";
+import Icon from "../components/Icon";
 
 function SOS() {
   const [loading, setLoading] = useState(false);
@@ -173,31 +174,31 @@ function SOS() {
   const toggleShake = () => {
     if (!shakeActive) {
       if (typeof DeviceMotionEvent !== "undefined" && typeof DeviceMotionEvent.requestPermission === "function") {
-        DeviceMotionEvent.requestPermission().then((res) => { if (res === "granted") setShakeActive(true); localStorage.setItem("shakeActive", "true"); }).catch(() => setError("Motion permission denied."));
+        DeviceMotionEvent.requestPermission().then((res) => { if (res === "granted") { setShakeActive(true); localStorage.setItem("shakeActive", "true"); } }).catch(() => setError("Motion permission denied."));
       } else { setShakeActive(true); localStorage.setItem("shakeActive", "true"); }
     } else { setShakeActive(false); localStorage.setItem("shakeActive", "false"); }
   };
 
   return (
-    <div className="min-h-screen bg-pink-50 p-6">
+    <div className="min-h-screen bg-paper p-6">
       <div className="max-w-2xl mx-auto">
-        <h1 className="text-3xl font-bold text-pink-700 mb-2">SOS Emergency</h1>
-        <p className="text-gray-500 mb-6">Multiple ways to trigger emergency alert</p>
+        <h1 className="font-display text-3xl text-ink mb-2">SOS Emergency</h1>
+        <p className="text-slate mb-6">Multiple ways to raise an alert</p>
 
-        {error && <p className="text-red-500 bg-red-50 p-3 rounded-lg mb-4">{error}</p>}
+        {error && <p className="text-beacon bg-beacon/10 p-3 rounded-lg mb-4 text-sm">{error}</p>}
 
-        <div className="bg-white rounded-2xl shadow p-4 mb-6 flex justify-between items-center">
+        <div className="bg-white rounded-2xl shadow-sm border border-slate/10 p-4 mb-6 flex justify-between items-center">
           <div>
             {location ? (
-              <p className="text-green-600 font-medium">Location: {location.latitude.toFixed(4)}, {location.longitude.toFixed(4)}</p>
+              <p className="text-signal font-medium text-sm">Location: {location.latitude.toFixed(4)}, {location.longitude.toFixed(4)}</p>
             ) : (
-              <p className="text-yellow-600 font-medium">Getting your location...</p>
+              <p className="text-slate font-medium text-sm">Getting your location...</p>
             )}
-            {liveTracking && <p className="text-blue-600 text-sm mt-1 font-medium">Live tracking active</p>}
+            {liveTracking && <p className="text-dusk text-xs mt-1 font-medium">Live tracking active</p>}
           </div>
           {location && (
-            <button onClick={openLiveLocation} className="bg-blue-500 text-white px-3 py-2 rounded-lg hover:bg-blue-600 transition text-sm">
-              View on Map
+            <button onClick={openLiveLocation} className="bg-dusk/10 text-dusk px-3 py-2 rounded-lg hover:bg-dusk/15 transition text-sm font-medium">
+              View on map
             </button>
           )}
         </div>
@@ -207,35 +208,36 @@ function SOS() {
             <button
               onClick={handleSOS}
               disabled={loading}
-              className="w-48 h-48 rounded-full bg-red-600 text-white text-2xl font-bold shadow-2xl hover:bg-red-700 active:scale-95 transition-all border-8 border-red-300"
+              className="relative w-44 h-44 rounded-full bg-beacon text-white shadow-2xl shadow-beacon/30 hover:bg-beacon-dark active:scale-95 transition-all flex flex-col items-center justify-center gap-1"
             >
-              {loading ? "Sending..." : "SOS"}
+              <span className="beacon-ring"></span>
+              <Icon name="siren" className="w-9 h-9 relative z-10" strokeWidth={1.6} />
+              <span className="font-display text-lg relative z-10">{loading ? "Sending..." : "SOS"}</span>
             </button>
           ) : (
             <div className="flex flex-col items-center gap-4 w-full">
-              <div className="w-48 h-48 rounded-full bg-red-100 border-8 border-red-400 flex items-center justify-center">
+              <div className="w-44 h-44 rounded-full bg-beacon/10 border-4 border-beacon/30 flex items-center justify-center">
                 <div className="text-center">
-                  <p className="text-red-600 font-bold text-xl">Alert Sent!</p>
-                  {liveTracking && <p className="text-blue-600 text-xs mt-1">Tracking live</p>}
+                  <p className="text-beacon font-display text-xl">Alert sent</p>
+                  {liveTracking && <p className="text-dusk text-xs mt-1">Tracking live</p>}
                 </div>
               </div>
 
-              {/* Emergency Contacts WhatsApp */}
               {emergencyContacts.length > 0 && (
-                <div className="bg-white rounded-2xl shadow p-4 w-full">
-                  <p className="font-bold text-gray-700 mb-3">Alert Emergency Contacts:</p>
+                <div className="bg-white rounded-2xl shadow-sm border border-slate/10 p-4 w-full">
+                  <p className="font-semibold text-ink mb-3 text-sm">Alert emergency contacts</p>
                   <div className="flex flex-col gap-2">
                     {emergencyContacts.map((contact, index) => (
                       <button
                         key={index}
                         onClick={() => sendWhatsApp(contact.phone)}
-                        className="flex justify-between items-center bg-green-500 text-white px-4 py-3 rounded-xl hover:bg-green-600 transition"
+                        className="flex justify-between items-center bg-signal/10 text-signal px-4 py-3 rounded-xl hover:bg-signal/15 transition"
                       >
                         <div className="text-left">
-                          <p className="font-semibold">{contact.name}</p>
-                          <p className="text-green-100 text-sm">{contact.relation} � {contact.phone}</p>
+                          <p className="font-semibold text-ink">{contact.name}</p>
+                          <p className="text-slate text-xs">{contact.relation} — {contact.phone}</p>
                         </div>
-                        <span className="text-2xl">??</span>
+                        <Icon name="chat" className="w-5 h-5" />
                       </button>
                     ))}
                   </div>
@@ -243,75 +245,79 @@ function SOS() {
               )}
 
               {emergencyContacts.length === 0 && (
-                <div className="bg-yellow-50 border border-yellow-300 rounded-xl p-3 w-full">
-                  <p className="text-yellow-700 text-sm">No emergency contacts saved. Go to Profile to add contacts.</p>
+                <div className="bg-dusk/5 border border-dusk/15 rounded-xl p-3 w-full">
+                  <p className="text-slate text-sm">No emergency contacts saved. Go to Profile to add contacts.</p>
                 </div>
               )}
 
               <div className="flex gap-3 w-full">
-                <button
-                  onClick={openLiveLocation}
-                  className="flex-1 bg-blue-500 text-white py-2 rounded-lg hover:bg-blue-600 transition"
-                >
-                  My Location
+                <button onClick={openLiveLocation} className="flex-1 bg-dusk text-white py-2.5 rounded-full hover:bg-dusk-light transition text-sm font-medium">
+                  My location
                 </button>
-                <button
-                  onClick={() => handleResolve(currentSosId || history[0]?._id)}
-                  className="flex-1 bg-green-500 text-white py-2 rounded-lg hover:bg-green-600 transition"
-                >
-                  Mark Safe
+                <button onClick={() => handleResolve(currentSosId || history[0]?._id)} className="flex-1 bg-signal text-white py-2.5 rounded-full hover:opacity-90 transition text-sm font-medium">
+                  Mark safe
                 </button>
               </div>
             </div>
           )}
         </div>
 
-        <div className="bg-white rounded-2xl shadow p-6 mb-4">
-          <div className="flex justify-between items-center">
-            <div>
-              <h2 className="text-lg font-bold text-gray-800">?? Voice SOS</h2>
-              <p className="text-gray-500 text-sm mt-1">Say "help", "emergency" or "bachao"</p>
-              {voiceStatus && <p className="text-pink-600 text-sm mt-2 font-medium">{voiceStatus}</p>}
+        <div className="bg-white rounded-2xl shadow-sm border border-slate/10 p-5 mb-4">
+          <div className="flex justify-between items-center gap-3">
+            <div className="flex items-start gap-3">
+              <div className="w-9 h-9 rounded-lg bg-dusk/10 text-dusk flex items-center justify-center shrink-0">
+                <Icon name="chat" className="w-4.5 h-4.5" />
+              </div>
+              <div>
+                <h2 className="text-ink font-semibold text-sm">Voice SOS</h2>
+                <p className="text-slate text-xs mt-1">Say "help", "emergency" or "bachao"</p>
+                {voiceStatus && <p className="text-dusk text-xs mt-1 font-medium">{voiceStatus}</p>}
+              </div>
             </div>
             <button
               onClick={voiceActive ? stopVoice : startVoice}
-              className={"px-4 py-2 rounded-lg font-medium transition " + (voiceActive ? "bg-red-500 text-white" : "bg-pink-600 text-white")}
+              className={"px-4 py-2 rounded-full font-medium transition text-sm whitespace-nowrap " + (voiceActive ? "bg-beacon text-white" : "bg-ink text-white")}
             >
               {voiceActive ? "Stop" : "Start"}
             </button>
           </div>
         </div>
 
-        <div className="bg-white rounded-2xl shadow p-6 mb-6">
-          <div className="flex justify-between items-center">
-            <div>
-              <h2 className="text-lg font-bold text-gray-800">?? Shake Detection</h2>
-              <p className="text-gray-500 text-sm mt-1">Shake your phone to trigger SOS</p>
-              {shakeActive && <p className="text-green-600 text-sm mt-2 font-medium">Shake detection active!</p>}
+        <div className="bg-white rounded-2xl shadow-sm border border-slate/10 p-5 mb-6">
+          <div className="flex justify-between items-center gap-3">
+            <div className="flex items-start gap-3">
+              <div className="w-9 h-9 rounded-lg bg-dusk/10 text-dusk flex items-center justify-center shrink-0">
+                <Icon name="siren" className="w-4.5 h-4.5" />
+              </div>
+              <div>
+                <h2 className="text-ink font-semibold text-sm">Shake detection</h2>
+                <p className="text-slate text-xs mt-1">Shake your phone to trigger SOS</p>
+                {shakeActive && <p className="text-signal text-xs mt-1 font-medium">Active</p>}
+              </div>
             </div>
             <button
               onClick={toggleShake}
-              className={"px-4 py-2 rounded-lg font-medium transition " + (shakeActive ? "bg-red-500 text-white" : "bg-pink-600 text-white")}
+              className={"px-4 py-2 rounded-full font-medium transition text-sm whitespace-nowrap " + (shakeActive ? "bg-beacon text-white" : "bg-ink text-white")}
             >
               {shakeActive ? "Stop" : "Enable"}
             </button>
           </div>
         </div>
 
-        <div className="bg-white rounded-2xl shadow p-6">
-          <h2 className="text-xl font-semibold text-pink-600 mb-4">SOS History</h2>
+        <div className="bg-white rounded-2xl shadow-sm border border-slate/10 p-6">
+          <h2 className="font-display text-lg text-ink mb-4">SOS history</h2>
           {history.length === 0 ? (
-            <p className="text-gray-400">No SOS alerts triggered yet</p>
+            <p className="text-slate text-sm">No SOS alerts triggered yet</p>
           ) : (
             <div className="flex flex-col gap-3">
               {history.map((item) => (
-                <div key={item._id} className="border border-pink-100 rounded-xl p-4 flex justify-between items-center">
+                <div key={item._id} className="border border-slate/10 rounded-xl p-4 flex justify-between items-center">
                   <div>
-                    <p className="font-medium text-gray-700">{item.message}</p>
-                    <p className="text-sm text-gray-400">{new Date(item.createdAt).toLocaleString()}</p>
-                    <p className="text-sm text-gray-500">Location: {item.location.address}</p>
+                    <p className="font-medium text-ink text-sm">{item.message}</p>
+                    <p className="text-xs text-slate mt-0.5">{new Date(item.createdAt).toLocaleString()}</p>
+                    <p className="text-xs text-slate">Location: {item.location.address}</p>
                   </div>
-                  <span className={"px-3 py-1 rounded-full text-sm font-medium " + (item.status === "active" ? "bg-red-100 text-red-600" : "bg-green-100 text-green-600")}>
+                  <span className={"px-3 py-1 rounded-full text-xs font-medium " + (item.status === "active" ? "bg-beacon/10 text-beacon" : "bg-signal/10 text-signal")}>
                     {item.status}
                   </span>
                 </div>

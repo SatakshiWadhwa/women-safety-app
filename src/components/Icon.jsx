@@ -1,4 +1,4 @@
-﻿function Icon({ name, className = "w-6 h-6", strokeWidth = 1.8 }) {
+function Icon({ name, className = "w-6 h-6", strokeWidth = 1.8 }) {
   const icons = {
     shield: <path d="M12 2 3 6v6c0 5 4 8.5 9 10 5-1.5 9-5 9-10V6l-9-4z" />,
     siren: (
@@ -36,6 +36,33 @@
       </>
     ),
     arrow: <path d="M5 12h14M13 6l6 6-6 6" />,
+    close: <path d="M18 6 6 18M6 6l12 12" />,
+    eye: (
+      <>
+        <path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7-10-7-10-7z" />
+        <circle cx="12" cy="12" r="3" />
+      </>
+    ),
+    scale: (
+      <>
+        <path d="M12 3v18M7 21h10M5 7l-3 6a3 3 0 0 0 6 0l-3-6zM19 7l-3 6a3 3 0 0 0 6 0l-3-6zM5 7h4M15 7h4M9 7l3-3 3 3" />
+      </>
+    ),
+    plus: <path d="M12 5v14M5 12h14" />,
+    minus: <path d="M5 12h14" />,
+    cross: (
+      <>
+        <path d="M12 21s7-7.2 7-12a7 7 0 1 0-14 0c0 4.8 7 12 7 12z" />
+        <path d="M12 8v6M9 11h6" />
+      </>
+    ),
+    pill: (
+      <>
+        <rect x="3" y="11" width="18" height="6" rx="3" transform="rotate(-25 12 14)" />
+        <path d="M9.5 9.5l5 5" />
+      </>
+    ),
+    flame: <path d="M12 3c1 3-3 4-3 7a3 3 0 0 0 6 0c0-1-1-2-1-2s2 1 2 4a5 5 0 0 1-10 0c0-4 3-6 3-9a8 8 0 0 1 3 0z" />,
   };
 
   return (
